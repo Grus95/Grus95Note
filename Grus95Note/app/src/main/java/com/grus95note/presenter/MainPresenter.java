@@ -3,7 +3,7 @@ package com.grus95note.presenter;
 import android.os.Handler;
 import android.view.View;
 
-import com.grus95note.Model.ModelFaker;
+import com.grus95note.model.ModelFaker;
 import com.grus95note.adapter.MultiTypeAdapter;
 import com.grus95note.iItem.EmptyItem;
 import com.grus95note.iItem.ErrorItem;

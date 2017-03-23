@@ -1,4 +1,4 @@
-package com.grus95note.Model;
+package com.grus95note.model;
 
 import com.grus95note.adapter.MultiTypeAdapter;
 import com.grus95note.iItem.BaseItem;

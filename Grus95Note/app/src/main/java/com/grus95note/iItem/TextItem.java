@@ -2,7 +2,7 @@ package com.grus95note.iItem;
 
 import android.view.View;
 
-import com.grus95note.Model.TextModel;
+import com.grus95note.model.TextModel;
 import com.grus95note.R;
 import com.grus95note.adapter.MultiTypeAdapter;
 
