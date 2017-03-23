@@ -13,7 +13,7 @@ public class EmptyItem extends BaseItem {
     }
 
     public EmptyItem() {
-        content = "Currently has no items, please refresh it later!";
+        content = "点击，加载数据！";
     }
 
     // data part

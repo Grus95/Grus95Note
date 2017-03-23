@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
                         mainPresenter.refreshData();
                     }
                 });
-
+        swipeRefreshLayout.setEnabled(false);
         recyclerView.setHasFixedSize(true);
         final LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
@@ -76,8 +76,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE &&
-                        llm.findLastVisibleItemPosition() >=
-                                mainPresenter.getAdapter().getItemCount() - 1) {
+                        llm.findLastVisibleItemPosition() >= mainPresenter.getAdapter().getItemCount() - 1) {
                     mainPresenter.loadMoreData();
                 }
             }
