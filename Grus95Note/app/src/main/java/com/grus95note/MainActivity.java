@@ -1,9 +1,13 @@
 package com.grus95note;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,17 +18,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.grus95note.databinding.ActivityMainBinding;
+import com.grus95note.interfaces.RefreshingView;
+import com.grus95note.presenter.MainPresenter;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, RefreshingView {
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView recyclerView;
+    private DrawerLayout drawer;
+    private MainPresenter mainPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        mainPresenter = new MainPresenter(this);
+        swipeRefreshLayout = binding.swipeRefreshLayout;
+        recyclerView = binding.recyclerView;
+        Toolbar toolbar = binding.toolbar;
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = binding.fab;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -33,19 +49,44 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = binding.drawerLayout;
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = binding.navView;
         navigationView.setNavigationItemSelectedListener(this);
+        initViews();
+    }
+
+    private void initViews() {
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        mainPresenter.refreshData();
+                    }
+                });
+
+        recyclerView.setHasFixedSize(true);
+        final LinearLayoutManager llm = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(llm);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE &&
+                        llm.findLastVisibleItemPosition() >=
+                                mainPresenter.getAdapter().getItemCount() - 1) {
+                    mainPresenter.loadMoreData();
+                }
+            }
+        });
+        recyclerView.setAdapter(mainPresenter.getAdapter());
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -95,12 +136,16 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     public void singIn (View view){
         startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    @Override
+    public void setRefreshing(boolean refreshing) {
+        swipeRefreshLayout.setRefreshing(refreshing);
     }
 }
