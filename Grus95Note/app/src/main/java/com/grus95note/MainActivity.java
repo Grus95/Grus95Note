@@ -17,9 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.grus95note.databinding.ActivityMainBinding;
 import com.grus95note.interfaces.RefreshingView;
+import com.grus95note.model.User;
 import com.grus95note.presenter.MainPresenter;
 
 public class MainActivity extends AppCompatActivity
@@ -29,11 +32,12 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private DrawerLayout drawer;
     private MainPresenter mainPresenter;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         mainPresenter = new MainPresenter(this);
         swipeRefreshLayout = binding.swipeRefreshLayout;
         recyclerView = binding.recyclerView;
@@ -54,10 +58,16 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = binding.navView;
-        navigationView.setNavigationItemSelectedListener(this);
+        binding.navView.setNavigationItemSelectedListener(this);
         initViews();
+    }
+
+    private void initUser(NavigationView navigationView) {
+        NoteApplication application = (NoteApplication) getApplication();
+        User user = application.getUser();
+        LinearLayout headerView = (LinearLayout) navigationView.getHeaderView(0);
+        ((TextView) headerView.findViewById(R.id.tv_user_id)).setText(user==null?"未登陆":user.getUserId());
+        ((TextView) headerView.findViewById(R.id.tv_user_name)).setText(user==null?"":user.getUserName());
     }
 
     private void initViews() {
@@ -82,6 +92,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
         recyclerView.setAdapter(mainPresenter.getAdapter());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initUser(binding.navView);
     }
 
     @Override
@@ -140,7 +156,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void singIn (View view){
-        startActivity(new Intent(this, LoginActivity.class));
+        if (!((NoteApplication) getApplication()).isLogin()){
+            startActivity(new Intent(this, LoginActivity.class));
+        }
     }
 
     @Override

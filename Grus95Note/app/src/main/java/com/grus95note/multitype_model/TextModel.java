@@ -1,27 +1,28 @@
-package com.grus95note.model;
+package com.grus95note.multitype_model;
 
 import com.grus95note.adapter.MultiTypeAdapter;
 import com.grus95note.iItem.BaseItem;
-import com.grus95note.iItem.ImageItem;
+import com.grus95note.iItem.TextItem;
 
+import java.util.Date;
 import java.util.Random;
 
 /**
  * Created by grus95 on 2017/3/23.
  */
 
-public class ImageModel extends BaseModel {
+public class TextModel extends MultiTypeModel {
     @Override
     public BaseItem createItem(MultiTypeAdapter adapter) {
-        return new ImageItem(adapter, this);
+        return new TextItem(adapter, this);
     }
 
-    public String url;
+    public String content;
     public boolean liked;
 
-    public ImageModel() {
+    public TextModel() {
         super();
-        url = "https://unsplash.it/200/200?random&" + new Random().nextInt(40);
+        content = new Date().toString();
         liked = new Random().nextBoolean();
     }
 }

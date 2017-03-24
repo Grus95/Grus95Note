@@ -1,4 +1,4 @@
-package com.grus95note.model;
+package com.grus95note.multitype_model;
 
 import java.util.Random;
 
@@ -7,7 +7,7 @@ import java.util.Random;
  */
 
 public class ModelFaker {
-    public static BaseModel fake() {
+    public static MultiTypeModel fake() {
         String type = new Random().nextBoolean() ? "image" : "text";
         if (type.equals("image")) {
             return new ImageModel();

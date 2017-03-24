@@ -1,27 +1,29 @@
 package com.grus95note.model;
 
-import com.grus95note.adapter.MultiTypeAdapter;
-import com.grus95note.iItem.BaseItem;
+import android.content.Context;
 
-import java.util.Date;
-import java.util.Random;
+import com.litesuits.orm.LiteOrm;
+import com.litesuits.orm.db.annotation.Ignore;
+import com.litesuits.orm.db.annotation.PrimaryKey;
+import com.litesuits.orm.db.enums.AssignType;
 
 /**
- * Created by grus95 on 2017/3/23.
+ * Created by grus95 on 2017/3/24.
  */
 
 public class BaseModel {
-    public BaseItem createItem(MultiTypeAdapter adapter) {
-        return null;
-    }
+    @PrimaryKey(AssignType.AUTO_INCREMENT)
+    int Id;
+    public static LiteOrm liteOrm;
 
-    public int id;
-    public Date createdAt;
-    public Date updatedAt;
+    @Ignore
+    static Context context;
 
-    public BaseModel() {
-        id = (new Random()).nextInt(10000);
-        createdAt = new Date();
-        updatedAt = new Date();
+    public BaseModel(Context context){
+        this.context = context;
+        if (liteOrm == null) {
+            liteOrm = LiteOrm.newSingleInstance(context, "grus-note");
+        }
+        liteOrm.setDebugged(true);
     }
 }
